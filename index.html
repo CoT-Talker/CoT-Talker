@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>CoT-Talker</title>
+		<link type="text/css" href="./css/basic.css" rel="stylesheet">
+		<link type="text/css" href="./css/index.css" rel="stylesheet">
+		<link type="text/css" href="./css/bootstrap.min.css" rel="stylesheet">
+		<script type='text/javascript' src="./js/jquery-3.3.1.min.js"></script>
+		<script type='text/javascript' src="./js/index.js"></script>
+	</head>
+	<body>
+		
+		<div class="main">
+			<div class="title">
+				<!-- <img class="top-img" src="img/background.png" /> -->
+				<span>Think before Synthesizing: Chain-of-Thought based Expressive Conversational Speech Generation</span>
+			</div>
+			<div class="content">
+				<div class="section author">
+					<span>
+						Anonymous Authors
+					</span>
+				</div>
+				<div class="section">
+					<div class="section-title">ABSTRACT</div>
+					<div class="section-content abstract">
+						Conversational Speech Synthesis (CSS) aims to ensure that the style of the synthesized speech for the target utterance matches the context of the user-agent interaction. Therefore, truly understanding dialogue style is a crucial prerequisite for synthesizing expressive conversational speech. However, current CSS systems mainly predict hidden style embedding, specific simple style factors (such as pitch, energy, etc.), or discrete emotion labels (such as happy, angry, etc.) for the target utterance according to the dialogue history, lacking interpretability and failing to capture fine-grained style variations in conversation setting. To address these issues, we propose a Chain-of-Thought (CoT) based CSS model, termed <b>CoT-Talker</b>. The core idea is to infer the style captions of the dialogue speech to be synthesized based on the conversation history before synthesis, ensuring a deep understanding of the conversational style. To achieve this, we also propose an automatic dialogue-aware style caption generation scheme for conversational speech, termed <b>CSS-StyleCap</b>. Specifically, we extract sentence-level and dialogue-level style attributes for each conversational utterance and then use a Large Language Model (LLM) to integrate them into interpretable dialogue-aware style captions. Both subjective and objective experimental results on two benchmarking CSS datasets, that are NCSSD and DailyTalk, indicate that our proposed method outperforms the baseline CSS systems in dialogue understanding and expressiveness rendering. These evaluations also underscore the importance of comprehensive style caption annotations. The annotated style caption, code, and demos are available at: <a href="https://github.com/CoT-Talker/CoT-Talker">https://github.com/CoT-Talker/CoT-Talker</a>.
+					</div> 
+				</div>
+				
+				<!-- <div class="section">
+					<div class="section-title">CONTENT</div>
+					<div class="section-content">
+						<a href="#1">DATASET: NCSSD</a></br>
+						<a href="#2">EXPERIMENTS</a></br>
+						&nbsp;&nbsp;<a href="#3">1. Reliability verification of NCSSD</a></br>
+						&nbsp;&nbsp;<a href="#4">2. Reliability verification of NCSSD</a></br>
+						&nbsp;&nbsp;&nbsp;&nbsp;<a href="#5">(1) Synthesized speech from the DailyTalk and NCSSD datasets (CL-EN & RC-EN)</a></br>
+						&nbsp;&nbsp;&nbsp;&nbsp;<a href="#6">(2) Experimental results of Three-Stage training</a></br>
+						&nbsp;&nbsp;&nbsp;&nbsp;<a href="#7">(3) GPT-Talker-synthesized emotional speech</a></br>
+						&nbsp;&nbsp;&nbsp;&nbsp;<a href="#8">(4) Experimental results of dialogue turn setting</a></br>
+						&nbsp;&nbsp;&nbsp;&nbsp;<a href="#9">(5) Experimental results of context serialization</a></br>
+						&nbsp;&nbsp;&nbsp;&nbsp;<a href="#10">(6) Experimental results of Zero-Shot timbre rendering</a></br>
+					</div>
+				</div> -->
+				
+				<div class="section">
+					<div class="section-title"><a name="2"></a>EXPERIMENTS</div>
+					
+					<div class="section-content">
+						<div class="subsection-title"><a name="3"></a>1. Verifying Style Controllability</div>
+						<!-- <div class="modal-title">To assess the style control capability of CoT-Talker, we compared it against leading controllable TTS methods using both content and style prompts. These controlled TTS models include:</div> -->
+					</div>
+					<div class="section-content experiments">
+						To assess the style control capability of CoT-Talker, we compared it against leading controllable TTS methods using both content and style prompts. These controlled TTS models include:
+						</br> 1) <b>PromptTTS (Guo et al. 2023)</b>: This model uses prompts with style captions and content as input to synthesize corresponding speech, with the backbone model being Fast-Speech2.
+						</br> 2) <b>Salle (Ji et al. 2024)</b>: This architecture treats style controllable TTS as a language model task, utilizing audio codec codes as an intermediate representation to replace the conventional mel-spectrogram.
+						</br> 3) <b>CoT-Talker (Proposed)</b>: We proposed a Chain-of-Thought (CoT) based CSS model.
+						</br> 4) <b>Ground Truth</b>: Real recorded speech.
+					</div>
+					<div class="section-content">
+						<div class="subsection-exp-1">
+							<div class="module-title"><strong>Sample #1:</strong></div>
+							<div class="module-content">
+								<table class="table-sample">
+								  <thead>
+								    <tr>
+										<th colspan="4" style="text-align: center"><strong>(Dataset: NCSSD-StyleCap):</strong></th>
+								    </tr>
+								  </thead>
+								  <tbody>
+									<tr>
+									  <td colspan="4" style="text-align: center"><span><b>Content Prompt:</b> Hi, dear, i've got your voice at last.</span></td>
+									</tr>
+									<tr>
+									  <td colspan="4" style="text-align: center"><span><b>Style Prompt:</b> Speaking with enthusiasm, her overjoyed voice takes on a high pitch.</span></td>
+									</tr>
+									<tr>
+										<td style="text-align: center">PromptTTS</td>
+										<td style="text-align: center">Salle</td>
+										<td style="text-align: center"><strong>CoT-Talker (Proposed)</strong></td>
+										<td style="text-align: center">Ground Truth</td>
+									</tr>
+									<tr>
+										<td style="text-align: left"><audio src="./audio/1/1-promptTTS.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/1/1-salle.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/1/1-CoT-Talker.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/1/1-gt.wav" controls="" preload=""></audio></td>
+								    </tr>
+								  </tbody>
+								</table>
+							</div>
+						</div>
+						
+						<div class="subsection-exp-2">
+							<div class="module-title"><strong>Sample #2:</strong></div>
+							<div class="module-content">
+								<table class="table-sample">
+								  <thead>
+								    <tr>
+										<th colspan="4" style="text-align: center"><strong>(Dataset: NCSSD-StyleCap):</strong></th>
+								    </tr>
+								  </thead>
+								  <tbody>
+									<tr>
+									  <td colspan="4" style="text-align: center"><span><b>Content Prompt:</b> I'm speaking french. don't you know anything?</span></td>
+									</tr>
+									<tr>
+									  <td colspan="4" style="text-align: center"><span><b>Style Prompt:</b> The energetic male speaker's high-pitched voice injects enthusiasm into his livid measured speech.</span></td>
+									</tr>
+									<tr>
+										<td style="text-align: center">PromptTTS</td>
+										<td style="text-align: center">Salle</td>
+										<td style="text-align: center"><strong>CoT-Talker (Proposed)</strong></td>
+										<td style="text-align: center">Ground Truth</td>
+									</tr>
+									<tr>
+										<td style="text-align: left"><audio src="./audio/2/2-promptTTS.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/2/2-salle.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/2/2-CoT-Talker.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/2/2-gt.wav" controls="" preload=""></audio></td>
+								    </tr>
+								  </tbody>
+								</table>
+							</div>
+						</div>
+						
+						<div class="subsection-exp-3">
+							<div class="module-title"><strong>Sample #3:</strong></div>
+							<div class="module-content">
+								<table class="table-sample">
+								  <thead>
+									<tr>
+										<th colspan="4" style="text-align: center"><strong>(Dataset: TextrolSpeech):</strong></th>
+									</tr>
+								  </thead>
+								  <tbody>
+									<tr>
+									  <td colspan="4" style="text-align: center"><span><b>Content Prompt:</b> What would they do at the end of the year?</span></td>
+									</tr>
+									<tr>
+									  <td colspan="4" style="text-align: center"><span><b>Style Prompt:</b> With his amazed tone elevated and speaking quickly, he radiates high energy.</span></td>
+									</tr>
+									<tr>
+										<td style="text-align: center">PromptTTS</td>
+										<td style="text-align: center">Salle</td>
+										<td style="text-align: center"><strong>CoT-Talker (Proposed)</strong></td>
+										<td style="text-align: center">Ground Truth</td>
+									</tr>
+									<tr>
+										<td style="text-align: left"><audio src="./audio/3/3-promptTTS.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/3/3-salle.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/3/3-CoT-Talker.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/3/3-gt.wav" controls="" preload=""></audio></td>
+									</tr>
+								  </tbody>
+								</table>
+							</div>
+						</div>
+							
+						<div class="subsection-exp-4">
+							<div class="module-title"><strong>Sample #4:</strong></div>
+							<div class="module-content">
+								<table class="table-sample">
+								  <thead>
+									<tr>
+										<th colspan="4" style="text-align: center"><strong>(Dataset: TextrolSpeech):</strong></th>
+									</tr>
+								  </thead>
+								  <tbody>
+									<tr>
+									  <td colspan="4" style="text-align: center"><span><b>Content Prompt:</b> Wake now my merry tads!</span></td>
+									</tr>
+									<tr>
+									  <td colspan="4" style="text-align: center"><span><b>Style Prompt:</b> Her voice was soft and her sad speech unfolded gradually.</span></td>
+									</tr>
+									<tr>
+										<td style="text-align: center">PromptTTS</td>
+										<td style="text-align: center">Salle</td>
+										<td style="text-align: center"><strong>CoT-Talker (Proposed)</strong></td>
+										<td style="text-align: center">Ground Truth</td>
+									</tr>
+									<tr>
+										<td style="text-align: left"><audio src="./audio/4/4-promptTTS.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/4/4-salle.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/4/4-CoT-Talker.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/4/4-gt.wav" controls="" preload=""></audio></td>
+									</tr>
+								  </tbody>
+								</table>
+							</div>
+						</div>
+							
+					</div>
+					
+					<div class="section-content">
+						<div class="subsection-title"><a name="4"></a>2. Validating Effectiveness in CSS</div>
+					</div>
+					<div class="section-content experiments">
+						We compared CoT-Talker with four advanced CSS models using the NCSSD-StyleCap dataset:
+						</br> 1) <b>GRU-based Context Modeling (we call “CCATTS” here)</b> (Guo et al. 2021): A context-aware CSS model, which employs a GRU-based network to model the sentence-level dependency among the dialogue context.
+						</br> 2) <b>Multi-Scale Context Modeling (FCTalker)</b> (Hu et al.2022): It uses both word-level and dialogue-level pre-trained language models to extract coarse-grained and fine-grained dialogue context information, respectively.
+						</br> 3) <b>Heterogeneous Graph-based Context Modeling (ECSS)</b> (Liu et al. 2024a): It considers different utterances in the dialogue context and modal information as individual graph nodes and uses a heterogeneous graph neural network to model the dialogue context.
+						</br> 4) <b>GPT-based Context Modeling (GPT-Talker)</b>  (Liu et al.2024b):  It takes the text and speech of the dialogue context as prompts and then utilizes a GPT-style autoregressive model to predict the discrete token sequence of the response speech, followed by synthesizing the final speech waveform using VITS.
+						</br> 5) <b>CoT-Talker (Proposed)</b>: We proposed a Chain-of-Thought (CoT) based CSS model.
+						</br> 6) <b>Ground Truth</b>: Real recorded speech.
+					</div>
+					
+					<div class="section-content">
+						<div class="subsection-exp-5">
+							<!-- sample 1 -->
+							<div class="module-title"><strong>Sample #1:</strong></div>
+							<div class="module-content">
+								<table class="table-sample">
+								  <thead>
+									<tr>
+										<th colspan="4" style="text-align: center"><strong>Dialogue History</strong></th>
+									</tr>
+								  </thead>
+								  <tbody>
+									<tr>
+										<td style="text-align: center" colspan="4">
+											<span>1. (Spk A) I am looking for a pan. </span>
+											</br>
+											<span>2. (Spk B) No problem. what size would you like?</span>
+											</br>
+											<audio src="./audio/demo-1/d23.wav" class="dialogue-wav" controls="" preload=""></audio>
+										</td>
+									</tr>
+								  </tbody>
+								</table>
+							</div>
+							<div class="module-content">
+								<table class="table-sample">
+								  <thead>
+								    <tr>
+										<th colspan="6" style="text-align: center"><strong>Current Utterance</strong></th>
+								    </tr>
+								  </thead>
+								  <tbody>
+									<tr>
+										<td style="text-align: center">CCATTS</td>
+										<td style="text-align: center">FCTalker</td>
+										<td style="text-align: center">ECSS</td>
+										<td style="text-align: center">GPT-Talker</td>
+										<td style="text-align: center"><strong>CoT-Talker (Proposed)</strong></td>
+										<td style="text-align: center">Ground Truth</td>
+									</tr>
+								    <tr>
+										<td colspan="6" style="text-align: center"><span>3. (Spk A) A big one would be nice.</span></td>
+								    </tr>
+									<tr>
+										<td style="text-align: left"><audio src="./audio/5/5-Guo.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/5/5-FCTalker.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/5/5-ECSS.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/5/5-GPT-Talker.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/5/5-CoT-Talker.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/5/5-gt.wav" controls="" preload=""></audio></td>
+								    </tr>
+								  </tbody>
+								</table>
+							</div>
+						</div>
+						
+						
+						<div class="subsection-exp-6">
+							<!-- sample 1 -->
+							<div class="module-title"><strong>Sample #2:</strong></div>
+							<div class="module-content">
+								<table class="table-sample">
+								  <thead>
+									<tr>
+										<th colspan="4" style="text-align: center"><strong>Dialogue History</strong></th>
+									</tr>
+								  </thead>
+								  <tbody>
+									<tr>
+										<td style="text-align: center" colspan="4">
+											<span>1. (Spk A) I often eat fish and eggs. </span>
+											</br>
+											<span>2. (Spk B) Do you eat a lot of vegetables?</span>
+											</br>
+											<audio src="./audio/6/d64.wav" class="dialogue-wav" controls="" preload=""></audio>
+										</td>
+									</tr>
+								  </tbody>
+								</table>
+							</div>
+							<div class="module-content">
+								<table class="table-sample">
+								  <thead>
+								    <tr>
+										<th colspan="6" style="text-align: center"><strong>Current Utterance</strong></th>
+								    </tr>
+								  </thead>
+								  <tbody>
+									<tr>
+										<td style="text-align: center">CCATTS</td>
+										<td style="text-align: center">FCTalker</td>
+										<td style="text-align: center">ECSS</td>
+										<td style="text-align: center">GPT-Talker</td>
+										<td style="text-align: center"><strong>CoT-Talker (Proposed)</strong></td>
+										<td style="text-align: center">Ground Truth</td>
+									</tr>
+								    <tr>
+										<td colspan="6" style="text-align: center"><span>3. (Spk A) Oh yes, and fruits. i love fruits very much.</span></td>
+								    </tr>
+									<tr>
+										<td style="text-align: left"><audio src="./audio/6/6-Guo.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/6/6-FCTalker.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/6/6-ECSS.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/6/6-GPT-Talker.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/6/6-CoT-Talker.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/6/6-gt.wav" controls="" preload=""></audio></td>
+								    </tr>
+								  </tbody>
+								</table>
+							</div>
+						</div>
+					
+						<div class="subsection-exp-7">
+							<!-- sample 1 -->
+							<div class="module-title"><strong>Sample #3:</strong></div>
+							<div class="module-content">
+								<table class="table-sample">
+								  <thead>
+									<tr>
+										<th colspan="4" style="text-align: center"><strong>Dialogue History</strong></th>
+									</tr>
+								  </thead>
+								  <tbody>
+									<tr>
+										<td style="text-align: center" colspan="4">
+											<span>1. (Spk A) What do you think about the current industrial structure? I am afraid it's not sustainable.  </span>
+											</br>
+											<span>2. (Spk B) I totally agree. The overbalance on a single industry is very risky business. </span>
+											</br>
+											<audio src="./audio/7/d50.wav" class="dialogue-wav" controls="" preload=""></audio>
+										</td>
+									</tr>
+								  </tbody>
+								</table>
+							</div>
+							<div class="module-content">
+								<table class="table-sample">
+								  <thead>
+								    <tr>
+										<th colspan="6" style="text-align: center"><strong>Current Utterance</strong></th>
+								    </tr>
+								  </thead>
+								  <tbody>
+									<tr>
+										<td style="text-align: center">CCATTS</td>
+										<td style="text-align: center">FCTalker</td>
+										<td style="text-align: center">ECSS</td>
+										<td style="text-align: center">GPT-Talker</td>
+										<td style="text-align: center"><strong>CoT-Talker (Proposed)</strong></td>
+										<td style="text-align: center">Ground Truth</td>
+									</tr>
+								    <tr>
+										<td colspan="6" style="text-align: center"><span>3. (Spk A) Exactly, if that industry collapses, it will have a devastating impact on the economy. </span></td>
+								    </tr>
+									<tr>
+										<td style="text-align: left"><audio src="./audio/7/7-Guo.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/7/7-FCTalker.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/7/7-ECSS.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/7/7-GPT-Talker.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/7/7-CoT-Talker.wav" controls="" preload=""></audio></td>
+										<td style="text-align: left"><audio src="./audio/7/7-gt.wav" controls="" preload=""></audio></td>
+								    </tr>
+								  </tbody>
+								</table>
+							</div>
+						</div>
+					
+					
+					
+					
+					
+					</div>
+					
+					
+
+				</div>
+			</div>
+		</div>
+		
+		
+	</body>
+</html>
